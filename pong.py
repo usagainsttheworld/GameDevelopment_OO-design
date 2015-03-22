@@ -57,17 +57,17 @@ def draw(canvas):
 
     # collides with top/bottom 
     if ball_pos[1] <= BALL_RADIUS or ball_pos[1] >= HEIGHT-BALL_RADIUS:
-       ball_vel[1] = -ball_vel[1]
+        ball_vel[1] = -ball_vel[1]
  
     # collides with left/right 
     if ball_pos[0] <= (PAD_WIDTH + BALL_RADIUS):
-        if ball_pos[1] < (paddle1_pos - PAD_HEIGHT) or ball_pos[1] > (paddle1_pos+PAD_HEIGHT): 
+        if ball_pos[1] < (paddle1_pos - HALF_PAD_HEIGHT) or ball_pos[1] > (paddle1_pos + HALF_PAD_HEIGHT): 
             spawn_ball(RIGHT)
             green_score +=1      
         else:
             ball_vel[0] = -ball_vel[0]*1.1
     if ball_pos[0] >= WIDTH - 1 - PAD_WIDTH - BALL_RADIUS:
-        if ball_pos[1] < (paddle1_pos - PAD_HEIGHT) or ball_pos[1] > (paddle1_pos+PAD_HEIGHT): 
+        if ball_pos[1] < (paddle2_pos - HALF_PAD_HEIGHT) or ball_pos[1] > (paddle2_pos + HALF_PAD_HEIGHT): 
             spawn_ball(LEFT)
             red_score +=1
         else:
