@@ -32,6 +32,63 @@ for line in mydata:
 ave = mynum / counter
 print "Average spam confidence: ", ave 	
 
+#8.4
+#read romeo.txt. for each line, split line into list. for each word on each line
+#check to see if the word is already in the list and if not append to the list. 
+#when program completes, sort and print the resulting words.
+fname = raw_input('Enter file name:')
+mydata = open (fname)
+unique_words = list()
+for line in mydata:
+	splitLine = line.split()
+	for word in splitLine:
+		if word not in unique_words:
+			unique_words.append(word)
+unique_words.sort()			
+print unique_words
+
+#8.5
+# read mbox-short.txt by line. for lines starts with "From". split the line 
+# and print out the second word. Then print out a count at the end.
+fname = raw_input('Enter file name:')
+mydata = open (fname)
+counter = 0
+for line in mydata:
+	line = line.rstrip()
+	if not line.startswith('From '): continue
+	counter = counter + 1
+	words = line.split()
+	print words[1]
+print "There were", counter, "lines in the file with From as the first word"
+
+#9.4 read from mbox-short.txt and figure who has sent the greatest number
+# of mail messages (looks for "From" lines and takes the second word of those lines)
+fname = raw_input('Enter file name:')
+mydata = open (fname)
+
+emails = list()
+for line in mydata:
+        line = line.rstrip()
+	if not line.startswith('From '): continue
+	words = line.split()
+	emails.append(words[1])
+#print emails         
+
+countEmail = dict()
+for email in emails:
+	countEmail[email] = countEmail.get(email,0) + 1
+#print countEmail	
+
+bigcount = None        
+big_email_sender = None
+for email,count in countEmail.items():
+	if bigcount is None or count > bigcount:
+		big_email_sender = email
+		bigcount = count
+print big_email_sender, bigcount	
+
+
+
 
 
 
