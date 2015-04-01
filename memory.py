@@ -1,4 +1,3 @@
-
 #"Memory" Game
 
 import simplegui
@@ -13,7 +12,7 @@ state = 0
 card_fliped1 = 0
 card_fliped2 = 0
 turns = 0
-              
+           
 # helper function to initialize globals
 def new_game():
     global numbers, exposed, turns
@@ -36,10 +35,8 @@ def mouseclick(pos):
     if exposed[index] == False: #only response to mouseclick when card is not exposed
         if state == 0:
             exposed[index] = True
-            turns = turns + 1
             state = 1
-            card_fliped1 = index
-          
+            card_fliped1 = index  
         elif state == 1:
             exposed[index] = True
             turns = turns + 1
@@ -50,13 +47,13 @@ def mouseclick(pos):
                 exposed[card_fliped1] = False #flip them over
                 exposed[card_fliped2] = False
             exposed[index] = True
-            turns = turns + 1
             card_fliped1 = index #reset the fliped card1
-            state = 1            
+            state = 1  
 
 # cards are logically 50x100 pixels in size    
 def draw(canvas):
     global exposed, index, card_height, card_width 
+    label.set_text("Turns = " + str(turns)) #update the turns 
     for index in range(0, 16):
         if exposed[index] == True: #exposed is True, the card should face up with value visible
             canvas.draw_text(str(numbers[index]), (index*card_width+10, 65), 50, "White")  
@@ -69,11 +66,11 @@ def draw(canvas):
 frame = simplegui.create_frame("Memory", 800, 100)
 frame.add_button("Reset", new_game)
 label = frame.add_label('label')
-label.set_text("turns = " + str(turns))
 
 # register event handlers
 frame.set_mouseclick_handler(mouseclick)
 frame.set_draw_handler(draw)
+
 # get things rolling
 new_game()
 frame.start()
