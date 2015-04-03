@@ -87,6 +87,31 @@ for email,count in countEmail.items():
 		bigcount = count
 print big_email_sender, bigcount	
 
+#10.2 Read the mbox-short.txt and figure out the distrubute
+#by hour of the day for each messages. once get the counts 
+# for each hour, print out the counts, sorted by hour.
+fname = raw_input('Enter file name:')
+mydata = open (fname)
+
+hours = list()
+for line in mydata:
+        line = line.rstrip()
+	if not line.startswith('From '): continue
+	words = line.split()
+	time = words[5].split(':')
+	hours.append(time[0])
+#print hours
+counts = dict()
+for hour in hours:
+	counts[hour] = counts.get(hour, 0) + 1
+#print counts	
+list_hour = list()
+for key, val in counts.items():
+	list_hour.append((key, val))
+
+list_hour.sort()
+for key, val in list_hour:
+	print key, val
 
 
 
