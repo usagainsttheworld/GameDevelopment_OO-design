@@ -84,6 +84,68 @@ frame.set_draw_handler(draw)
 
 frame.start()
 
+#Quiz 5a
+#Q9
+mylist = [0, 1]
+for i in range(0, 40):
+    mylist.append(sum([mylist[-1], mylist[-2]]))
+print mylist
+
+#Quiz 6a
+class BankAccount:
+    def __init__(self, initial_balance):
+        self.balance = initial_balance
+        self.fee = 0
+        """Creates an account with the given balance."""
+    def deposit(self, amount):
+        self.balance = self.balance + amount
+        """Deposits the amount into the account."""
+    def withdraw(self, amount):
+        self.balance = self.balance - amount
+        if self.balance < 0:
+            self.balance = self.balance - 5
+            self.fee = self.fee + 5
+        """
+        Withdraws the amount from the account.  Each withdrawal resulting in a
+        negative balance also deducts a penalty fee of 5 dollars from the balance.
+        """
+    def get_balance(self):
+        """Returns the current balance in the account."""
+        return self.balance
+    def get_fees(self):
+        """Returns the total fees ever deducted from the account."""
+        return self.fee
+account1 = BankAccount(10)
+account1.withdraw(15)
+account2 = BankAccount(15)
+account2.deposit(10)
+account1.deposit(20)
+account2.withdraw(20)
+print account1.get_balance(), account1.get_fees(), 
+      account2.get_balance(), account2.get_fees()
+
+#Quiz 6b
+#Q7 keep only prime number in the list
+n = 1000
+numbers = range(2, n)
+result = []
+while len(numbers) > 0:
+    result.append(numbers[0])
+    numbers = [n for n in numbers if n % numbers[0] != 0]
+print len(result)
+
+#Q8 by which year fast worm outnumber slow worm
+def Wump(slow, fast):
+    i = 1
+    while slow > fast:
+        slow = slow*2
+        slow = slow *0.6
+        fast = fast *2
+        fast = fast *0.7
+        i = i+1
+        print "in year", i, "slow is:", slow, "fast is:", fast
+     
+Wump(1000, 1)   
     
                      
 
