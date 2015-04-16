@@ -146,6 +146,44 @@ def Wump(slow, fast):
         print "in year", i, "slow is:", slow, "fast is:", fast
      
 Wump(1000, 1)   
+
+###########################################
+#Quiz 7a
+#Q1
+class Point2D:
+    def __init__(self, x = 0, y = 0):
+        self.x = x
+        self.y = y
+
+    def translate(self, deltax = 0, deltay = 0):
+        """Translate the point in the x direction by deltax
+           and in the y direction by deltay."""
+        self.x += deltax
+        self.y += deltay
+point1 = Point2D(3, 9)
+point2 = Point2D()
+point2.translate(20, 4)  
+
+#Q2
+class Point2D:
+    def __init__(self, x = 0, y = 0):
+        self.x = x
+        self.y = y
+
+    def translate(self, deltax = 0, deltay = 0):
+        """Translate the point in the x direction by deltax
+           and in the y direction by deltay."""
+        self.x += deltax
+        self.y += deltay
+point0 = Point2D(2, 5)
+point1 = Point2D(8, 3)
+point2 = Point2D(0, 2)
+points = [point0, point1, point2]
+for point in points:
+    point.translate(-1, -1)
+
+
+
     
                      
 
