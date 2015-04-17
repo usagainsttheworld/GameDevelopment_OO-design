@@ -71,7 +71,6 @@ explosion_sound = simplegui.load_sound("http://commondatastorage.googleapis.com/
 # helper functions to handle transformations
 def angle_to_vector(ang):
     return [math.cos(ang), math.sin(ang)]
-
 def dist(p,q):
     return math.sqrt((p[0] - q[0]) ** 2+(p[1] - q[1]) ** 2)
 
@@ -87,7 +86,6 @@ class Ship:
         self.image_center = info.get_center()
         self.image_size = info.get_size()
         self.radius = info.get_radius()
-
     def draw(self,canvas):
         if self.thrust:
             self.image_center[0] = 135
@@ -95,7 +93,6 @@ class Ship:
             self.image_center[0] = 45  
         canvas.draw_image(ship_image, ship_info.get_center(), ship_info.get_size(), 
                           self.pos, ship_info.get_size(), self.angle)
-
     def update(self):  
         self.angle += self.angle_vel
         self.pos[0] += self.vel[0]
@@ -103,13 +100,24 @@ class Ship:
         self.pos[0] %= WIDTH #keep the ship in screen
         self.pos[1] %= HEIGHT
         forward = angle_to_vector(self.angle)
-        self.vel[0] *=(1-0.02) #friction of 0.2
-        self.vel[1] *=(1-0.02)       
+        self.vel[0] *=(1-0.01) #friction of 0.2
+        self.vel[1] *=(1-0.01)       
         if self.thrust:
             self.vel[0] += forward[0]*0.1
-            self.vel[1] += forward[1]*0.1
-
-    
+            self.vel[1] += forward[1]*0.1 
+        if self.thrust:
+            ship_thrust_sound.play()
+        else:
+            ship_thrust_sound.rewind()
+            
+    def shoot(self):
+        global a_missile
+        foward=angle_to_vector(self.angle)
+        a_missile = Sprite([self.pos[0]+45*foward[0],self.pos[1]+45*foward[1]], #missile position (tip of ship's cannon)
+                           [self.vel[0]+foward[0]*3,self.vel[1]+foward[1]*3], #vel=ship vel+ a multiple of ship forward vector
+                           0, 0, missile_image, missile_info, missile_sound) #zero angular vel
+        self.pos[0] %= WIDTH #keep the missile in screen
+        self.pos[1] %= HEIGHT       
 def keydown(key):
     if key == simplegui.KEY_MAP["left"]:
         my_ship.angle_vel -= 0.03 #turning counter-clockwise
@@ -117,7 +125,9 @@ def keydown(key):
         my_ship.angle_vel += 0.03 #turning clockwise
     elif key == simplegui.KEY_MAP["up"]:
         my_ship.thrust = True
-
+    elif key == simplegui.KEY_MAP["space"]:# shoot missile   
+        my_ship.shoot()
+        
 def keyup (key):
     if key == simplegui.KEY_MAP["left"]:
         my_ship.angle_vel = 0 #maintain orientation when keys up 
@@ -142,18 +152,19 @@ class Sprite:
         self.age = 0
         if sound:
             sound.rewind()
-            sound.play()
-   
+            sound.play()   
     def draw(self, canvas):
-        canvas.draw_circle(self.pos, self.radius, 1, "Red", "Red")
-    
+        canvas.draw_image(self.image, self.image_center, self.image_size, 
+                          self.pos, self.image_size, self.angle)    
     def update(self):
-        pass        
-
+        self.angle += self.angle_vel
+        self.pos[0] += self.vel[0]
+        self.pos[1] += self.vel[1]
+        self.pos[0] %= WIDTH #keep the rock in screen
+        self.pos[1] %= HEIGHT
            
 def draw(canvas):
     global time
-    
     # animiate background
     time += 1
     wtime = (time / 4) % WIDTH
@@ -162,6 +173,10 @@ def draw(canvas):
     canvas.draw_image(nebula_image, nebula_info.get_center(), nebula_info.get_size(), [WIDTH / 2, HEIGHT / 2], [WIDTH, HEIGHT])
     canvas.draw_image(debris_image, center, size, (wtime - WIDTH / 2, HEIGHT / 2), (WIDTH, HEIGHT))
     canvas.draw_image(debris_image, center, size, (wtime + WIDTH / 2, HEIGHT / 2), (WIDTH, HEIGHT))
+    
+    canvas.draw_text('lives: '+ str(lives), (50, 50), 20, "white")
+    canvas.draw_text('score: '+ str(score), (50, 100), 20, "white")
+    
 
     # draw ship and sprites
     my_ship.draw(canvas)
@@ -175,14 +190,16 @@ def draw(canvas):
             
 # timer handler that spawns a rock    
 def rock_spawner():
-    pass
+    global a_rock
+    a_rock = Sprite([random.randrange(WIDTH), random.randrange(HEIGHT)], [-0.5+random.random(), -0.5+random.random()],
+                    2*math.pi*random.random(), (-0.5+random.random())/2, asteroid_image, asteroid_info)         
     
 # initialize frame
 frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
 # initialize ship and two sprites
-my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
-a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, 0, asteroid_image, asteroid_info)
+my_ship = Ship([WIDTH / 2, HEIGHT / 2], [1, 1], 0, ship_image, ship_info)
+a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, 0.1, asteroid_image, asteroid_info)
 a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
 
 # register handlers
