@@ -182,6 +182,30 @@ points = [point0, point1, point2]
 for point in points:
     point.translate(-1, -1)
 
+########################################
+#Quiz 8
+#Q8 How many distinct numbers are printed by the following code? Enter the count.
+
+'''def next(x):
+    return (x ** 2 + 79) % 997
+
+x = 1
+for i in range(1000):
+    print x
+    x = next(x)'''
+
+def next(x):
+    return (x ** 2 + 79) % 997
+
+x = 1
+s=set([])
+for i in range(1000):
+    #print x
+    s.add(x)
+    x = next(x)
+print len(s)
+
+
 
 
     
