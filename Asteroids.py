@@ -98,7 +98,7 @@ class Ship:
         self.image_center = info.get_center()
         self.image_size = info.get_size()
         self.radius = info.get_radius()
-        
+                
     def draw(self,canvas):
         if self.thrust:
             canvas.draw_image(self.image, [self.image_center[0] + self.image_size[0], self.image_center[1]] , self.image_size,
@@ -177,7 +177,17 @@ class Sprite:
         # update position
         self.pos[0] = (self.pos[0] + self.vel[0]) % WIDTH
         self.pos[1] = (self.pos[1] + self.vel[1]) % HEIGHT
-  
+        
+    def collide(self, other_object):
+        r1 = self.radius
+        r2 = other_object.radius
+        other_pos = other_object.pos 
+        d = math.sqrt((self.pos[0]-other_pos[0])**2+(self.pos[1]-other_pos[1])**2)
+        if r1+r2 > d:
+            return True
+        else:
+            return False
+
         
 # key handlers to control ship   
 def keydown(key):
@@ -209,7 +219,7 @@ def click(pos):
         started = True
 
 def draw(canvas):
-    global time, started
+    global time, started, lives
     
     # animiate background
     time += 1
@@ -236,7 +246,10 @@ def draw(canvas):
     #a_rock.update()
     a_missile.update()
     
-    process_sprite_group(rock_group, canvas)
+    process_sprite_group(rock_group, canvas) #bring 12 rocks on the screen
+    
+    if group_collide(rock_group, my_ship):
+        lives -= 1
     
     # draw splash screen if not started
     if not started:
@@ -262,6 +275,17 @@ def process_sprite_group(a_set, a_canvas):
     for each_spt in a_set:
         each_spt.update()
         each_spt.draw(a_canvas)
+
+#helper function to check collisions btw an object and a group
+def group_collide(group, other_object):
+    remove_set = set([])
+    g_collide = False
+    for element in group:
+        if element.collide(other_object):
+            remove_set.add(element)
+            g_collide = True    
+    group.difference_update(remove_set)
+    return g_collide
         
 # initialize stuff
 frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
