@@ -84,10 +84,9 @@ def angle_to_vector(ang):
 def dist(p, q):
     return math.sqrt((p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2)
 
-
 # Ship class
+missile_group = set([]) #Global variable for group of missile
 class Ship:
-
     def __init__(self, pos, vel, angle, image, info):
         self.pos = [pos[0], pos[1]]
         self.vel = [vel[0], vel[1]]
@@ -138,15 +137,15 @@ class Ship:
         
     def decrement_angle_vel(self):
         self.angle_vel -= .05
-        
+  
     def shoot(self):
-        global a_missile
+        global missile_group
         forward = angle_to_vector(self.angle)
         missile_pos = [self.pos[0] + self.radius * forward[0], self.pos[1] + self.radius * forward[1]]
         missile_vel = [self.vel[0] + 6 * forward[0], self.vel[1] + 6 * forward[1]]
-        a_missile = Sprite(missile_pos, missile_vel, self.angle, 0, missile_image, missile_info, missile_sound)
-    
-    
+        new_missile = Sprite(missile_pos, missile_vel, self.angle, 0, missile_image, missile_info, missile_sound)
+        missile_group.add(new_missile)
+   
     
 # Sprite class
 class Sprite:
@@ -173,10 +172,12 @@ class Sprite:
     def update(self):
         # update angle
         self.angle += self.angle_vel
-        
         # update position
         self.pos[0] = (self.pos[0] + self.vel[0]) % WIDTH
         self.pos[1] = (self.pos[1] + self.vel[1]) % HEIGHT
+        #updata age
+        self.age += 1
+        return self.age >= self.lifespan
         
     def collide(self, other_object):
         r1 = self.radius
@@ -219,7 +220,7 @@ def click(pos):
         started = True
 
 def draw(canvas):
-    global time, started, lives
+    global time, started, lives, missile_group
     
     # animiate background
     time += 1
@@ -238,18 +239,17 @@ def draw(canvas):
 
     # draw ship and sprites
     my_ship.draw(canvas)
-    #a_rock.draw(canvas)
-    a_missile.draw(canvas)
-    
-    # update ship and sprites
     my_ship.update()
-    #a_rock.update()
-    a_missile.update()
-    
     process_sprite_group(rock_group, canvas) #bring 12 rocks on the screen
+    process_sprite_group(missile_group, canvas)#shoot multiple missiles
+    for missle in list(missile_group):#creates a new list(copy of elements in the set) and to iterating over this new list while removing things from the set
+        if missle.update():
+            missile_group.remove(missle)
     
-    if group_collide(rock_group, my_ship):
+    # process collision
+    if group_collide(rock_group, my_ship):#check if ship collide with any of the rocks, if so, loss a life
         lives -= 1
+    group_group_collide(rock_group, missile_group)
     
     # draw splash screen if not started
     if not started:
@@ -278,7 +278,7 @@ def process_sprite_group(a_set, a_canvas):
 
 #helper function to check collisions btw an object and a group
 def group_collide(group, other_object):
-    remove_set = set([])
+    remove_set = set([]) #create an empty set to collect elements to be romoved
     g_collide = False
     for element in group:
         if element.collide(other_object):
@@ -286,22 +286,30 @@ def group_collide(group, other_object):
             g_collide = True    
     group.difference_update(remove_set)
     return g_collide
+
+#helper function to check collisions btw two groups
+def group_group_collide(group1, group2):
+    num_collide = 0
+    for element in list(group1):
+        if group_collide(group2, element):
+            num_collide += 1
+            group1.discard(element)
+            return num_collide
         
+
 # initialize stuff
 frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
 # initialize ship and two sprites
 my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
-a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, .1, asteroid_image, asteroid_info)
-a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
-
+#a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, .1, asteroid_image, asteroid_info)
+#a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
 
 # register handlers
 frame.set_keyup_handler(keyup)
 frame.set_keydown_handler(keydown)
 frame.set_mouseclick_handler(click)
 frame.set_draw_handler(draw)
-
 timer = simplegui.create_timer(1000.0, rock_spawner)
 
 # get things rolling
